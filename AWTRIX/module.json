@@ -1,0 +1,14 @@
+{
+    "id": "{BD05743E-37B4-9761-C5E8-6FC2367A967B}",
+    "name": "AWTRIX",
+    "type": 3,
+    "vendor": "AWTRIX",
+    "aliases": [
+        "AWTRIX"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "AWT",
+    "url": "https://github.com/ubittner/SymconAWTRIX"
+}

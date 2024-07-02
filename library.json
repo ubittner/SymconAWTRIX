@@ -1,0 +1,12 @@
+{
+    "id": "{CE8941EB-E52B-A75B-098C-ABE5740A64E9}",
+    "name": "AWTRIX",
+    "author": "Ulrich Bittner",
+    "url": "https://github.com/ubittner/SymconAWTRIX",
+    "compatibility": {
+        "version": "7.1"
+    },
+    "version": "1.0",
+    "build": 1,
+    "date": 1719927666
+}
