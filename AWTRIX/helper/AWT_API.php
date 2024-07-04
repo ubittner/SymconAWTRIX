@@ -84,7 +84,7 @@ trait AWT_API
         if ($userName != '' && $password != '') {
             $auth = true;
         }
-        $header = '';
+        $header = [];
         if ($auth) {
             $header = [
                 'Content-Type: application/json',
