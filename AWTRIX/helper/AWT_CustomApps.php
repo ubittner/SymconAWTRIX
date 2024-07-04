@@ -30,14 +30,12 @@ trait AWT_CustomApps
         $this->UpdateFormField('ActualCustomApps', 'values', json_encode($actualApps));
     }
 
-    public function UpdateCustomApps(bool $CheckUpdate): void
+    public function UpdateCustomApps(): void
     {
         $apps = json_decode($this->ReadPropertyString('CustomApps'), true);
         foreach ($apps as $app) {
-            if ($CheckUpdate) {
-                if (!$app['UseUpdate']) {
-                    continue;
-                }
+            if (!$app['UseUpdate']) {
+                continue;
             }
             $action = json_decode($app['Action'], true);
             @IPS_RunAction($action['actionID'], $action['parameters']);

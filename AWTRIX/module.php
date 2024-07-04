@@ -158,7 +158,7 @@ class AWTRIX extends IPSModule
         //Updates
         $this->UpdateStats();
         $this->UpdateSettings();
-        $this->UpdateCustomApps(false);
+        $this->UpdateCustomApps();
 
         //Will update the built-in apps and reboot the device
         $this->UpdateBuiltInApps();
