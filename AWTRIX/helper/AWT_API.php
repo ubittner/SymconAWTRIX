@@ -36,13 +36,23 @@ trait AWT_API
         return $this->SendDataToDevice('screen', 'GET', '');
     }
 
+    public function GetSettings(): string
+    {
+        return $this->SendDataToDevice('settings', 'GET', '');
+    }
+
+    public function SetSettings(string $Payload): string
+    {
+        return $this->SendDataToDevice('settings', 'POST', $Payload);
+    }
+
     public function RebootDevice(): void
     {
         $this->SendDataToDevice('reboot', 'POST', '');
         $this->SetAutomaticRebootTimer();
     }
 
-    ########## Custom Apps
+    ########## Apps
 
     public function GetAppsInLoop(): string
     {
