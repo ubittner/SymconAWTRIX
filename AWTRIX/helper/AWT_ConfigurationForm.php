@@ -16,7 +16,7 @@ trait AWT_ConfigurationForm
 
     public function ExpandExpansionPanels(bool $State): void
     {
-        for ($i = 1; $i <= 4; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $this->UpdateFormField('Panel' . $i, 'expanded', $State);
         }
     }
@@ -164,8 +164,7 @@ trait AWT_ConfigurationForm
                     ],
                     [
                         'type'    => 'Label',
-                        'caption' => ' ',
-                        'visible' => false
+                        'caption' => ' '
                     ],
                     [
                         'type'    => 'Label',
@@ -203,6 +202,68 @@ trait AWT_ConfigurationForm
                 ]
             ];
 
+        //Settings
+        $form['elements'][] =
+            [
+                'type'    => 'ExpansionPanel',
+                'name'    => 'Panel3',
+                'caption' => 'Settings',
+                'items'   => [
+                    [
+                        'type'    => 'NumberSpinner',
+                        'name'    => 'AppDisplayDuration',
+                        'caption' => 'App Anzeigedauer',
+                        'suffix'  => 'Sekunden'
+                    ],
+                    [
+                        'type'    => 'NumberSpinner',
+                        'name'    => 'TimeAppStyle',
+                        'caption' => 'Stil der Zeit-App',
+                        'minimum' => 0,
+                        'maximum' => 4
+                    ],
+                ]
+            ];
+
+        //Built-in Apps
+        $form['elements'][] =
+            [
+                'type'    => 'ExpansionPanel',
+                'name'    => 'Panel4',
+                'caption' => 'Built-in Apps',
+                'items'   => [
+                    [
+                        'type'    => 'CheckBox',
+                        'name'    => 'UseBuiltInAppTime',
+                        'caption' => 'Uhrzeit'
+                    ],
+                    [
+                        'type'    => 'CheckBox',
+                        'name'    => 'UseBuiltInAppDate',
+                        'caption' => 'Datum'
+                    ],
+                    [
+                        'type'    => 'CheckBox',
+                        'name'    => 'UseBuiltInAppTemperature',
+                        'caption' => 'Temperatur'
+                    ],
+                    [
+                        'type'    => 'CheckBox',
+                        'name'    => 'UseBuiltInAppHumidity',
+                        'caption' => 'Luftfeuchtigkeit'
+                    ],
+                    [
+                        'type'    => 'CheckBox',
+                        'name'    => 'UseBuiltInAppBattery',
+                        'caption' => 'Batterie'
+                    ],
+                    [
+                        'type'    => 'Label',
+                        'caption' => ' '
+                    ]
+                ]
+            ];
+
         //Custom Apps
         $customApps = json_decode($this->ReadPropertyString('CustomApps'), true);
         $amountCustomAppsRows = count($customApps) + 1;
@@ -224,7 +285,7 @@ trait AWT_ConfigurationForm
         $form['elements'][] =
             [
                 'type'    => 'ExpansionPanel',
-                'name'    => 'Panel3',
+                'name'    => 'Panel5',
                 'caption' => 'Custom Apps',
                 'items'   => [
                     [
@@ -334,7 +395,7 @@ trait AWT_ConfigurationForm
         $form['elements'][] =
             [
                 'type'    => 'ExpansionPanel',
-                'name'    => 'Panel4',
+                'name'    => 'Panel6',
                 'caption' => 'Notifications',
                 'items'   => [
                     [
@@ -481,13 +542,13 @@ trait AWT_ConfigurationForm
                 ],
                 [
                     'type'    => 'Label',
-                    'caption' => 'Custom Apps',
+                    'caption' => 'Apps',
                     'bold'    => true,
                     'italic'  => true
                 ],
                 [
                     'type'    => 'PopupButton',
-                    'caption' => 'Apps verwalten',
+                    'caption' => 'Anzeigen',
                     'popup'   => [
                         'caption' => 'Custom Apps',
                         'items'   => [
@@ -495,8 +556,6 @@ trait AWT_ConfigurationForm
                                 'type'     => 'List',
                                 'name'     => 'ActualCustomApps',
                                 'add'      => false,
-                                'delete'   => true,
-                                'onDelete' => $module['Prefix'] . '_DeleteCustomApp($id, $ActualCustomApps["Name"]);',
                                 'rowCount' => 1,
                                 'sort'     => [
                                     'column'    => 'Number',
@@ -537,7 +596,7 @@ trait AWT_ConfigurationForm
                         [
                             'type'    => 'ValidationTextBox',
                             'name'    => 'Notification',
-                            'caption' => 'Benachrichtigung',
+                            'caption' => 'Text',
                             'width'   => '600px',
                             'value'   => 'Dies ist ein Test!'
                         ],

@@ -13,10 +13,12 @@ class AWTRIX extends IPSModule
 {
     //Helper
     use AWT_API;
+    use AWT_BuiltInApps;
     use AWT_ConfigurationForm;
     use AWT_Control;
     use AWT_CustomApps;
     use AWT_Notifications;
+    use AWT_Settings;
 
     //Constants
     private const LIBRARY_GUID = '{CE8941EB-E52B-A75B-098C-ABE5740A64E9}';
@@ -40,6 +42,17 @@ class AWTRIX extends IPSModule
         $this->RegisterPropertyInteger('StatusInterval', 300);
         $this->RegisterPropertyBoolean('UseAutomaticReboot', false);
         $this->RegisterPropertyString('RebootTime', '{"hour":1,"minute":0,"second":0}');
+
+        //Settings
+        $this->RegisterPropertyInteger('AppDisplayDuration', 7);
+        $this->RegisterPropertyInteger('TimeAppStyle', 1);
+
+        //Built-in Apps
+        $this->RegisterPropertyBoolean('UseBuiltInAppTime', false);
+        $this->RegisterPropertyBoolean('UseBuiltInAppDate', false);
+        $this->RegisterPropertyBoolean('UseBuiltInAppTemperature', false);
+        $this->RegisterPropertyBoolean('UseBuiltInAppHumidity', false);
+        $this->RegisterPropertyBoolean('UseBuiltInAppBattery', false);
 
         //Custom apps
         $this->RegisterPropertyString('CustomApps', '[]');
@@ -138,14 +151,17 @@ class AWTRIX extends IPSModule
             }
         }
 
-        //Updates
-        $this->UpdateStats();
-        $this->UpdateCustomApps(false);
-
         //Timer
-        $this->SetTimerInterval('UpdateStats', $this->ReadPropertyInteger('StatusInterval') * 1000);
         $this->SetAutomaticRebootTimer();
         $this->SetTimerInterval('UpdateCustomApps', $this->ReadPropertyInteger('CustomAppsUpdateInterval') * 1000);
+
+        //Updates
+        $this->UpdateStats();
+        $this->UpdateSettings();
+        $this->UpdateCustomApps(false);
+
+        //Will update the built-in apps and reboot the device
+        $this->UpdateBuiltInApps();
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
