@@ -37,8 +37,10 @@ trait AWT_CustomApps
             if (!$app['UseUpdate']) {
                 continue;
             }
-            $action = json_decode($app['Action'], true);
-            @IPS_RunAction($action['actionID'], $action['parameters']);
+            if ($app['UseScript']) {
+                $script = $app['Script'];
+                IPS_RunScriptText($script);
+            }
         }
         $this->SetTimerInterval('UpdateCustomApps', $this->ReadPropertyInteger('CustomAppsUpdateInterval') * 1000);
     }

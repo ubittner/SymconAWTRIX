@@ -56,7 +56,7 @@ trait AWT_ConfigurationForm
         ########## Elements
 
         //Configuration buttons
-        $form['elements'][0] =
+        $form['elements'][] =
             [
                 'type'  => 'RowLayout',
                 'items' => [
@@ -233,6 +233,12 @@ trait AWT_ConfigurationForm
                 'caption' => 'Built-in Apps',
                 'items'   => [
                     [
+                        'type'    => 'Label',
+                        'caption' => 'Manueller Geräte-Neustart erforderlich!',
+                        'bold'    => true,
+                        'italic'  => true
+                    ],
+                    [
                         'type'    => 'CheckBox',
                         'name'    => 'UseBuiltInAppTime',
                         'caption' => 'Uhrzeit'
@@ -256,10 +262,6 @@ trait AWT_ConfigurationForm
                         'type'    => 'CheckBox',
                         'name'    => 'UseBuiltInAppBattery',
                         'caption' => 'Batterie'
-                    ],
-                    [
-                        'type'    => 'Label',
-                        'caption' => ' '
                     ]
                 ]
             ];
@@ -280,7 +282,7 @@ trait AWT_ConfigurationForm
             $customAppsValues[] = ['rowColor' => $rowColor];
         }
 
-        $customAppsScript = '$appName = \"AppName\"; \n$payload = []; \n$payload[\'icon\'] = \"\"; \n$payload[\'text\'] = \"Hello, AWTRIX 3!\"; \n$payload[\'duration\'] = 10; \nAWT_AddCustomApp(' . $this->InstanceID . ', $appName, json_encode($payload));';
+        $customAppsScript = '<?php' . "\n\n" . '$appName = "App Name";' . "\n" . '$icon = "21256";' . "\n" . '$energyID = 12345;' . "\n" . '$energyValue = GetValue($energyID);' . "\n" . '$text = $energyValue . " W";' . "\n" . '$duration = 10;' . "\n\n" . '//Keine Änderungen ab hier!' . "\n" . '$payload = [];' . "\n" . '$payload["icon"] = $icon;' . "\n" . '$payload["text"] = $text;' . "\n" . '$payload["duration"] = $duration;' . "\n" . 'AWT_AddCustomApp(' . $this->InstanceID . ', $appName, json_encode($payload));';
 
         $form['elements'][] =
             [
@@ -311,7 +313,7 @@ trait AWT_ConfigurationForm
                                 ]
                             ],
                             [
-                                'caption' => 'Name',
+                                'caption' => 'App Name',
                                 'name'    => 'Name',
                                 'width'   => '200px',
                                 'add'     => '',
@@ -320,16 +322,63 @@ trait AWT_ConfigurationForm
                                 ]
                             ],
                             [
-                                'caption' => 'Aktion',
-                                'name'    => 'Action',
-                                'width'   => '600px',
-                                'add'     => '{"actionID":"{346AA8C1-30E0-1663-78EF-93EFADFAC650}","parameters":{"SCRIPT":"<?php\n\n' . $customAppsScript . '","ENVIRONMENT":"Default","PARENT":' . $this->InstanceID . ',"TARGET": ' . $this->InstanceID . '}}',
+                                'caption' => 'Benutze Skript',
+                                'name'    => 'UseScript',
+                                'width'   => '150px',
+                                'add'     => true,
                                 'edit'    => [
-                                    'type' => 'SelectAction'
+                                    'type' => 'CheckBox'
+                                ]
+                            ],
+                            [
+                                'caption'  => 'Skript',
+                                'name'     => 'Script',
+                                'width'    => '600px',
+                                'add'      => $customAppsScript,
+                                'edit'     => [
+                                    'type' => 'ScriptEditor'
                                 ]
                             ]
                         ],
-                        'values' => $customAppsValues
+                        'values' => $customAppsValues,
+                        'form'   => [
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Allgemein',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseUpdate',
+                                'caption' => 'Aktualisieren'
+                            ],
+                            [
+                                'type'    => 'ValidationTextBox',
+                                'name'    => 'Name',
+                                'caption' => 'App Name'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Skript',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseScript',
+                                'caption' => 'Benutze Skript'
+                            ],
+                            [
+                                'type'     => 'ScriptEditor',
+                                'name'     => 'Script',
+                                'rowCount' => 15
+                            ]
+                        ]
                     ],
                     [
                         'type'    => 'NumberSpinner',
@@ -337,7 +386,7 @@ trait AWT_ConfigurationForm
                         'caption' => 'Aktualisierung',
                         'minimum' => 0,
                         'suffix'  => 'Sekunden'
-                    ],
+                    ]
                 ]
             ];
 
@@ -390,7 +439,7 @@ trait AWT_ConfigurationForm
             $notificationsValues[] = ['rowColor' => $rowColor];
         }
 
-        $notificationsScript = '$payload = []; \n$payload[\'icon\'] = \"\"; \n$payload[\'text\'] = \"Hello, AWTRIX 3!\"; \n$payload[\'duration\'] = 10; \nAWT_SendNotification(' . $this->InstanceID . ', json_encode($payload));';
+        $notificationsScript = '<?php' . "\n\n" . '$icon = "112";' . "\n" . '$trigerID = 12345;' . "\n" . '$triggerValue = GetValue($triggerID);' . "\n" . '$text = $triggerValue . " hat einen Alarm ausgelöst!";' . "\n" . '$duration = 30;' . "\n\n" . '//Keine Änderungen ab hier!' . "\n" . '$payload = [];' . "\n" . '$payload["icon"] = $icon;' . "\n" . '$payload["text"] = $text;' . "\n" . '$payload["duration"] = $duration;' . "\n" . 'AWT_SendNotification(' . $this->InstanceID . ', json_encode($payload));';
 
         $form['elements'][] =
             [
@@ -460,16 +509,97 @@ trait AWT_ConfigurationForm
                                 ]
                             ],
                             [
-                                'caption' => 'Aktion',
-                                'name'    => 'Action',
-                                'width'   => '600px',
-                                'add'     => '{"actionID":"{346AA8C1-30E0-1663-78EF-93EFADFAC650}","parameters":{"SCRIPT":"<?php\n\n' . $notificationsScript . '","ENVIRONMENT":"Default","PARENT":' . $this->InstanceID . ',"TARGET": ' . $this->InstanceID . '}}',
+                                'caption' => 'Benutze Skript',
+                                'name'    => 'UseScript',
+                                'width'   => '150px',
+                                'add'     => true,
                                 'edit'    => [
-                                    'type' => 'SelectAction'
+                                    'type' => 'CheckBox'
+                                ]
+                            ],
+                            [
+                                'caption'  => 'Skript',
+                                'name'     => 'Script',
+                                'width'    => '600px',
+                                'add'      => $notificationsScript,
+                                'edit'     => [
+                                    'type' => 'ScriptEditor'
                                 ]
                             ]
                         ],
-                        'values' => $notificationsValues
+                        'values' => $notificationsValues,
+                        'form'   => [
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Allgemein',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'Use',
+                                'caption' => 'Aktiviert'
+                            ],
+                            [
+                                'type'    => 'ValidationTextBox',
+                                'name'    => 'Designation',
+                                'caption' => 'Bezeichnung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Auslöser',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseMultipleAlerts',
+                                'caption' => 'Mehrfachauslösung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'SelectCondition',
+                                'name'    => 'PrimaryCondition',
+                                'caption' => 'Primäre Bedingung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'SelectCondition',
+                                'name'    => 'SecondaryCondition',
+                                'caption' => 'Weitere Bedingungen',
+                                'multi'   => true
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Skript',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseScript',
+                                'caption' => 'Benutze Skript'
+                            ],
+                            [
+                                'type'     => 'ScriptEditor',
+                                'name'     => 'Script',
+                                'rowCount' => 15
+                            ]
+                        ]
                     ],
                     [
                         'type'     => 'OpenObjectButton',
@@ -528,6 +658,11 @@ trait AWT_ConfigurationForm
                                     ]
                                 ]
                             ]
+                        ],
+                        [
+                            'type'    => 'Button',
+                            'caption' => 'Webinterface',
+                            'onClick' => 'echo "http://' . $this->ReadPropertyString('DeviceIP') . '";'
                         ],
                         [
                             'type'    => 'Button',

@@ -44,8 +44,10 @@ trait AWT_Notifications
                                 $this->SendDebug(__FUNCTION__, 'Abbruch, die Bedingungen wurden nicht erfüllt!', 0);
                             } else {
                                 $this->SendDebug(__FUNCTION__, 'Die Bedingungen wurden erfüllt.', 0);
-                                $action = json_decode($variable['Action'], true);
-                                @IPS_RunAction($action['actionID'], $action['parameters']);
+                                if ($variable['UseScript']) {
+                                    $script = $variable['Script'];
+                                    IPS_RunScriptText($script);
+                                }
                             }
                         }
                     }

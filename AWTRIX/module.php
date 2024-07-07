@@ -156,12 +156,10 @@ class AWTRIX extends IPSModule
         $this->SetTimerInterval('UpdateCustomApps', $this->ReadPropertyInteger('CustomAppsUpdateInterval') * 1000);
 
         //Updates
-        $this->UpdateStats();
         $this->UpdateSettings();
-        $this->UpdateCustomApps();
-
-        //Will update the built-in apps and reboot the device
         $this->UpdateBuiltInApps();
+        $this->UpdateCustomApps();
+        $this->UpdateStats();
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
