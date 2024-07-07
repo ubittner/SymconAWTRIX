@@ -691,6 +691,8 @@ trait AWT_ConfigurationForm
                                 'type'     => 'List',
                                 'name'     => 'ActualCustomApps',
                                 'add'      => false,
+                                'delete'   => true,
+                                'onDelete' => $module['Prefix'] . '_DeleteCustomApp($id, $ActualCustomApps["Name"]);',
                                 'rowCount' => 1,
                                 'sort'     => [
                                     'column'    => 'Number',
