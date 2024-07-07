@@ -29,9 +29,5 @@ trait AWT_BuiltInApps
         //Battery
         $payload = '{"BAT":' . json_encode($this->ReadPropertyBoolean('UseBuiltInAppBattery')) . '}';
         $this->SetSettings($payload);
-
-        //Reboot
-        IPS_Sleep(500);
-        $this->RebootDevice();
     }
 }
