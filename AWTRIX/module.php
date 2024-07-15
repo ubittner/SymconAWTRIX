@@ -3,6 +3,7 @@
 /** @noinspection PhpRedundantMethodOverrideInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection SpellCheckingInspection */
+/** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
 declare(strict_types=1);
@@ -114,6 +115,45 @@ class AWTRIX extends IPSModule
             }
         }
 
+        //Custom apps
+        $variables = json_decode($this->ReadPropertyString('CustomApps'), true);
+        foreach ($variables as $variable) {
+            if (!$variable['UseTrigger']) {
+                continue;
+            }
+            //Primary condition
+            if ($variable['PrimaryCondition'] != '') {
+                $primaryCondition = json_decode($variable['PrimaryCondition'], true);
+                if (array_key_exists(0, $primaryCondition)) {
+                    if (array_key_exists(0, $primaryCondition[0]['rules']['variable'])) {
+                        $id = $primaryCondition[0]['rules']['variable'][0]['variableID'];
+                        if ($id > 1 && @IPS_ObjectExists($id)) {
+                            $this->RegisterReference($id);
+                            $this->RegisterMessage($id, VM_UPDATE);
+                        }
+                    }
+                }
+            }
+            //Secondary condition, multi
+            if ($variable['SecondaryCondition'] != '') {
+                $secondaryConditions = json_decode($variable['SecondaryCondition'], true);
+                if (array_key_exists(0, $secondaryConditions)) {
+                    if (array_key_exists('rules', $secondaryConditions[0])) {
+                        $rules = $secondaryConditions[0]['rules']['variable'];
+                        foreach ($rules as $rule) {
+                            if (array_key_exists('variableID', $rule)) {
+                                $id = $rule['variableID'];
+                                if ($id > 1 && @IPS_ObjectExists($id)) {
+                                    $this->RegisterReference($id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Notifications
         $variables = json_decode($this->ReadPropertyString('Notifications'), true);
         foreach ($variables as $variable) {
             if (!$variable['Use']) {
@@ -179,8 +219,15 @@ class AWTRIX extends IPSModule
                 //$Data[4] = timestamp value changed
                 //$Data[5] = timestamp last value
 
+                //Custom apps
+                if ($this->CheckCustomAppsTrigger($SenderID)) {
+                    $this->TriggerCustomApps($SenderID, $Data[1]);
+                }
+
                 //Trigger notifications
-                $this->TriggerNotifications($SenderID, $Data[1]);
+                if ($this->CheckNotificationsTrigger($SenderID)) {
+                    $this->TriggerNotifications($SenderID, $Data[1]);
+                }
                 break;
 
         }
