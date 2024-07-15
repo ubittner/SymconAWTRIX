@@ -2,6 +2,7 @@
 
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection SpellCheckingInspection */
+/** @noinspection DuplicatedCode */
 
 declare(strict_types=1);
 
@@ -267,17 +268,50 @@ trait AWT_ConfigurationForm
             ];
 
         //Custom Apps
+        $customAppsValues = [];
         $customApps = json_decode($this->ReadPropertyString('CustomApps'), true);
         $amountCustomAppsRows = count($customApps) + 1;
         if ($amountCustomAppsRows == 1) {
             $amountCustomAppsRows = 3;
         }
         $amountCustomApps = count($customApps);
-        $customAppsValues = [];
         foreach ($customApps as $customApp) {
-            $rowColor = '#DFDFDF'; //grey
-            if ($customApp['UseUpdate']) {
+            $sensorID = 0;
+            if ($customApp['PrimaryCondition'] != '') {
+                $primaryCondition = json_decode($customApp['PrimaryCondition'], true);
+                if (array_key_exists(0, $primaryCondition)) {
+                    if (array_key_exists(0, $primaryCondition[0]['rules']['variable'])) {
+                        $sensorID = $primaryCondition[0]['rules']['variable'][0]['variableID'];
+                    }
+                }
+            }
+            //Check conditions first
+            $conditions = true;
+            if ($sensorID <= 1 || !@IPS_ObjectExists($sensorID)) {
+                $conditions = false;
+            }
+            if ($customApp['SecondaryCondition'] != '') {
+                $secondaryConditions = json_decode($customApp['SecondaryCondition'], true);
+                if (array_key_exists(0, $secondaryConditions)) {
+                    if (array_key_exists('rules', $secondaryConditions[0])) {
+                        $rules = $secondaryConditions[0]['rules']['variable'];
+                        foreach ($rules as $rule) {
+                            if (array_key_exists('variableID', $rule)) {
+                                $id = $rule['variableID'];
+                                if ($id <= 1 || !@IPS_ObjectExists($id)) {
+                                    $conditions = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $rowColor = '#FFC0C0'; //red
+            if ($conditions) {
                 $rowColor = '#C0FFC0'; //light green
+                if (!$customApp['UseTrigger']) {
+                    $rowColor = '#DFDFDF'; //grey
+                }
             }
             $customAppsValues[] = ['rowColor' => $rowColor];
         }
@@ -304,15 +338,6 @@ trait AWT_ConfigurationForm
                         ],
                         'columns' => [
                             [
-                                'caption' => 'Aktualisieren',
-                                'name'    => 'UseUpdate',
-                                'width'   => '130px',
-                                'add'     => true,
-                                'edit'    => [
-                                    'type' => 'CheckBox'
-                                ]
-                            ],
-                            [
                                 'caption' => 'App Name',
                                 'name'    => 'Name',
                                 'width'   => '200px',
@@ -322,9 +347,67 @@ trait AWT_ConfigurationForm
                                 ]
                             ],
                             [
+                                'caption' => 'Bezeichnung',
+                                'name'    => 'Designation',
+                                'onClick' => $module['Prefix'] . '_ModifyListButton($id, "CustomAppsConfigurationButton", $CustomApps["PrimaryCondition"]);',
+                                'width'   => '300px',
+                                'add'     => '',
+                                'edit'    => [
+                                    'type' => 'ValidationTextBox'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Benutze Aktualisierung',
+                                'name'    => 'UseUpdate',
+                                'width'   => '200px',
+                                'add'     => true,
+                                'edit'    => [
+                                    'type' => 'CheckBox'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Benutze Auslöser',
+                                'name'    => 'UseTrigger',
+                                'width'   => '200px',
+                                'add'     => false,
+                                'edit'    => [
+                                    'type' => 'CheckBox'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Primäre Bedingung',
+                                'name'    => 'PrimaryCondition',
+                                'width'   => '600px',
+                                'add'     => '',
+                                'visible' => false,
+                                'edit'    => [
+                                    'type' => 'SelectCondition'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Mehrfachauslösung',
+                                'name'    => 'UseMultipleAlerts',
+                                'width'   => '200px',
+                                'add'     => false,
+                                'edit'    => [
+                                    'type' => 'CheckBox'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Weitere Bedingungen',
+                                'name'    => 'SecondaryCondition',
+                                'width'   => '600px',
+                                'add'     => '',
+                                'visible' => false,
+                                'edit'    => [
+                                    'type'  => 'SelectCondition',
+                                    'multi' => true
+                                ]
+                            ],
+                            [
                                 'caption' => 'Benutze Skript',
                                 'name'    => 'UseScript',
-                                'width'   => '150px',
+                                'width'   => '200px',
                                 'add'     => true,
                                 'edit'    => [
                                     'type' => 'CheckBox'
@@ -349,14 +432,68 @@ trait AWT_ConfigurationForm
                                 'italic'  => true
                             ],
                             [
-                                'type'    => 'CheckBox',
-                                'name'    => 'UseUpdate',
-                                'caption' => 'Aktualisieren'
-                            ],
-                            [
                                 'type'    => 'ValidationTextBox',
                                 'name'    => 'Name',
                                 'caption' => 'App Name'
+                            ],
+                            [
+                                'type'    => 'ValidationTextBox',
+                                'name'    => 'Designation',
+                                'caption' => 'Bezeichnung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Aktualisierung',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseUpdate',
+                                'caption' => 'Benutze Aktualisierung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => 'Auslöser',
+                                'bold'    => true,
+                                'italic'  => true
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseTrigger',
+                                'caption' => 'Benutze Auslöser'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'SelectCondition',
+                                'name'    => 'PrimaryCondition',
+                                'caption' => 'Primäre Bedingung'
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseMultipleAlerts',
+                                'caption' => 'Mehrfachauslösung'
+                            ],
+                            [
+                                'type'    => 'Label',
+                                'caption' => ' '
+                            ],
+                            [
+                                'type'    => 'SelectCondition',
+                                'name'    => 'SecondaryCondition',
+                                'caption' => 'Weitere Bedingungen',
+                                'multi'   => true
                             ],
                             [
                                 'type'    => 'Label',
@@ -379,6 +516,13 @@ trait AWT_ConfigurationForm
                                 'rowCount' => 15
                             ]
                         ]
+                    ],
+                    [
+                        'type'     => 'OpenObjectButton',
+                        'name'     => 'CustomAppsConfigurationButton',
+                        'caption'  => 'Bearbeiten',
+                        'visible'  => false,
+                        'objectID' => 0
                     ],
                     [
                         'type'    => 'NumberSpinner',
@@ -479,15 +623,6 @@ trait AWT_ConfigurationForm
                                 ]
                             ],
                             [
-                                'caption' => 'Mehrfachauslösung',
-                                'name'    => 'UseMultipleAlerts',
-                                'width'   => '180px',
-                                'add'     => false,
-                                'edit'    => [
-                                    'type' => 'CheckBox'
-                                ]
-                            ],
-                            [
                                 'caption' => 'Primäre Bedingung',
                                 'name'    => 'PrimaryCondition',
                                 'width'   => '600px',
@@ -495,6 +630,15 @@ trait AWT_ConfigurationForm
                                 'visible' => false,
                                 'edit'    => [
                                     'type' => 'SelectCondition'
+                                ]
+                            ],
+                            [
+                                'caption' => 'Mehrfachauslösung',
+                                'name'    => 'UseMultipleAlerts',
+                                'width'   => '280px',
+                                'add'     => false,
+                                'edit'    => [
+                                    'type' => 'CheckBox'
                                 ]
                             ],
                             [
@@ -511,7 +655,7 @@ trait AWT_ConfigurationForm
                             [
                                 'caption' => 'Benutze Skript',
                                 'name'    => 'UseScript',
-                                'width'   => '150px',
+                                'width'   => '200px',
                                 'add'     => true,
                                 'edit'    => [
                                     'type' => 'CheckBox'
@@ -556,18 +700,14 @@ trait AWT_ConfigurationForm
                                 'italic'  => true
                             ],
                             [
-                                'type'    => 'CheckBox',
-                                'name'    => 'UseMultipleAlerts',
-                                'caption' => 'Mehrfachauslösung'
-                            ],
-                            [
-                                'type'    => 'Label',
-                                'caption' => ' '
-                            ],
-                            [
                                 'type'    => 'SelectCondition',
                                 'name'    => 'PrimaryCondition',
                                 'caption' => 'Primäre Bedingung'
+                            ],
+                            [
+                                'type'    => 'CheckBox',
+                                'name'    => 'UseMultipleAlerts',
+                                'caption' => 'Mehrfachauslösung'
                             ],
                             [
                                 'type'    => 'Label',

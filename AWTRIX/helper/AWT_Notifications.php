@@ -2,6 +2,7 @@
 
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection SpellCheckingInspection */
+/** @noinspection DuplicatedCode */
 
 declare(strict_types=1);
 
@@ -54,5 +55,33 @@ trait AWT_Notifications
                 }
             }
         }
+    }
+
+    ########## Private
+
+    private function CheckNotificationsTrigger(int $VariableID): bool
+    {
+        $result = false;
+        $variables = json_decode($this->ReadPropertyString('Notifications'), true);
+        if (!empty($variables)) {
+            foreach ($variables as $variable) {
+                if ($variable['PrimaryCondition'] != '') {
+                    $primaryCondition = json_decode($variable['PrimaryCondition'], true);
+                    if (array_key_exists(0, $primaryCondition)) {
+                        if (array_key_exists(0, $primaryCondition[0]['rules']['variable'])) {
+                            $id = $primaryCondition[0]['rules']['variable'][0]['variableID'];
+                            if ($id == $VariableID) {
+                                if ($id > 1 && @IPS_ObjectExists($id)) {
+                                    if ($variable['Use']) {
+                                        $result = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $result;
     }
 }
