@@ -17,7 +17,7 @@ trait AWT_ConfigurationForm
 
     public function ExpandExpansionPanels(bool $State): void
     {
-        for ($i = 1; $i <= 6; $i++) {
+        for ($i = 1; $i <= 7; $i++) {
             $this->UpdateFormField('Panel' . $i, 'expanded', $State);
         }
     }
@@ -750,6 +750,29 @@ trait AWT_ConfigurationForm
                     ]
                 ]
             ];
+
+        $form['elements'][] = [
+            'type'     => 'ExpansionPanel',
+            'name'     => 'Panel7',
+            'caption'  => 'Deaktivierung',
+            'items'    => [
+                [
+                    'type'    => 'CheckBox',
+                    'name'    => 'UseAutomaticDeactivation',
+                    'caption' => 'Automatische Deaktivierung'
+                ],
+                [
+                    'type'    => 'SelectTime',
+                    'name'    => 'AutomaticDeactivationStartTime',
+                    'caption' => 'Startzeit'
+                ],
+                [
+                    'type'    => 'SelectTime',
+                    'name'    => 'AutomaticDeactivationEndTime',
+                    'caption' => 'Endzeit'
+                ]
+            ]
+        ];
 
         ########## Actions
 
