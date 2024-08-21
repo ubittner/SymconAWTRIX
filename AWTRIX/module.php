@@ -62,6 +62,11 @@ class AWTRIX extends IPSModule
         //Notification
         $this->RegisterPropertyString('Notifications', '[]');
 
+        //Automatic deactivation
+        $this->RegisterPropertyBoolean('UseAutomaticDeactivation', false);
+        $this->RegisterPropertyString('AutomaticDeactivationStartTime', '{"hour":22,"minute":0,"second":0}');
+        $this->RegisterPropertyString('AutomaticDeactivationEndTime', '{"hour":6,"minute":0,"second":0}');
+
         ########## Variables
 
         //Power
@@ -80,6 +85,8 @@ class AWTRIX extends IPSModule
         $this->RegisterTimer('UpdateStats', 0, $modulePrefix . '_UpdateStats(' . $this->InstanceID . ');');
         $this->RegisterTimer('AutomaticReboot', 0, $modulePrefix . '_RebootDevice(' . $this->InstanceID . ');');
         $this->RegisterTimer('UpdateCustomApps', 0, $modulePrefix . '_UpdateCustomApps(' . $this->InstanceID . ', true);');
+        $this->RegisterTimer('StartAutomaticDeactivation', 0, $modulePrefix . '_StartAutomaticDeactivation(' . $this->InstanceID . ');');
+        $this->RegisterTimer('StopAutomaticDeactivation', 0, $modulePrefix . '_StopAutomaticDeactivation(' . $this->InstanceID . ',);');
     }
 
     public function Destroy(): void
@@ -191,15 +198,16 @@ class AWTRIX extends IPSModule
             }
         }
 
-        //Timer
-        $this->SetAutomaticRebootTimer();
-        $this->SetTimerInterval('UpdateCustomApps', $this->ReadPropertyInteger('CustomAppsUpdateInterval') * 1000);
-
         //Updates
+        $this->UpdateStats();
         $this->UpdateSettings();
         $this->UpdateBuiltInApps();
         $this->UpdateCustomApps();
-        $this->UpdateStats();
+
+        //Timer
+        $this->SetAutomaticRebootTimer();
+        $this->SetAutomaticDeactivationTimer();
+        $this->SetTimerInterval('UpdateCustomApps', $this->ReadPropertyInteger('CustomAppsUpdateInterval') * 1000);
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void

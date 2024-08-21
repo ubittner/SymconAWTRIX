@@ -9,6 +9,18 @@ trait AWT_Control
 {
     ########## Public
 
+    public function StartAutomaticDeactivation(): void
+    {
+        $this->PowerDevice(false);
+        $this->SetAutomaticDeactivationTimer();
+    }
+
+    public function StopAutomaticDeactivation(): void
+    {
+        $this->PowerDevice(true);
+        $this->SetAutomaticDeactivationTimer();
+    }
+
     public function UpdateStats(): void
     {
         $stats = json_decode($this->GetStats(), true);
@@ -35,6 +47,23 @@ trait AWT_Control
 
     ########## Private
 
+    private function SetAutomaticDeactivationTimer(): void
+    {
+        $use = $this->ReadPropertyBoolean('UseAutomaticDeactivation');
+        //Start
+        $milliseconds = 0;
+        if ($use) {
+            $milliseconds = $this->GetInterval('AutomaticDeactivationStartTime');
+        }
+        $this->SetTimerInterval('StartAutomaticDeactivation', $milliseconds);
+        //End
+        $milliseconds = 0;
+        if ($use) {
+            $milliseconds = $this->GetInterval('AutomaticDeactivationEndTime');
+        }
+        $this->SetTimerInterval('StopAutomaticDeactivation', $milliseconds);
+    }
+
     private function SetAutomaticRebootTimer(): void
     {
         $milliseconds = 0;
@@ -58,5 +87,23 @@ trait AWT_Control
             $timestamp = mktime($hour, $minute, $second, (int) date('n'), (int) date('j'), (int) date('Y'));
         }
         return ($timestamp - $now) * 1000;
+    }
+
+    private function CheckAutomaticDeactivationTimer(): bool
+    {
+        if (!$this->ReadPropertyBoolean('UseAutomaticDeactivation')) {
+            return false;
+        }
+        $start = $this->GetTimerInterval('StartAutomaticDeactivation');
+        $stop = $this->GetTimerInterval('StopAutomaticDeactivation');
+        if ($start > $stop) {
+            //Deactivation timer is active, device must be powered off
+            $this->PowerDevice(false);
+            return true;
+        } else {
+            //Deactivation timer is inactive, device must be toggled on
+            $this->PowerDevice(true);
+            return false;
+        }
     }
 }
