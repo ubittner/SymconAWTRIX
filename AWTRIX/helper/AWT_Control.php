@@ -25,6 +25,10 @@ trait AWT_Control
     {
         $stats = json_decode($this->GetStats(), true);
 
+        if ($stats === null) {
+            return;
+        }
+
         /* Dummy data
         $data = '{"bat":100,"bat_raw":682,"type":0,"lux":0,"ldr_raw":87,"ram":137924,"bri":120,"temp":31,"hum":26,"uptime":41866,"wifi_signal":-59,"messages":0,"version":"0.96","indicator1":false,"indicator2":false,"indicator3":false,"app":"Humidity","uid":"awtrix_a123456","matrix":true,"ip_address":"192.168.1.234"}';
         $stats = json_decode($data, true);
